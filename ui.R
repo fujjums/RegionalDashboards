@@ -1,6 +1,7 @@
 #
 library(shiny)
 library(ggvis)
+library(leaflet)
 shinyUI(navbarPage("Regional Dashboard!",
   tabPanel("Orders",
     sidebarLayout(
@@ -62,4 +63,6 @@ shinyUI(navbarPage("Regional Dashboard!",
              )
            )
   )
+  
+  
 ))
