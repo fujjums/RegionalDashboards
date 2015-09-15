@@ -32,10 +32,9 @@ Members$mem_last_order_week <- as.Date(Members$mem_last_order_week, format = "%Y
 Members$mem_first_order_month <- as.Date(as.yearmon(Members$mem_first_order_week))
 Members$mem_first_order_year <- format(Members$mem_first_order_week, format="%Y")
 
-CommunityWeeks <- as.data.frame(read.csv("toMergeCommunityWeeks.csv", stringsAsFactors=FALSE, na.strings = "NA"))
-CommunityWeeks$order_week <- as.Date(CommunityWeeks$order_week, format = "%Y-%m-%d")
-CommunityWeeks$order_month <- as.Date(as.yearmon(CommunityWeeks$order_week))
-CommunityWeeks$order_year <- format(CommunityWeeks$order_week, format="%Y")
+Community <- as.data.frame(read.csv("toMergeCommunity.csv", stringsAsFactors=FALSE, na.strings = "NA"))
+Community$comm_first_pickup_week <- as.Date(Community$comm_first_pickup_week, format = "%Y-%m-%d")
+Community$comm_last_order_week <- as.Date(Community$comm_last_order_week, format = "%Y-%m-%d")
 
 
 
@@ -155,7 +154,7 @@ shinyServer(
         
       })
       
-    #Download Tab Output
+    #Data Tab Output
       output$orders_render_table_rawdata <- renderDataTable({
         orders_reactive_data()
       })
@@ -237,5 +236,43 @@ shinyServer(
           gvisColumnChart(orders_reactive_data, xvar=cohort_reactive_timeframe(), yvar=c("1","2","3","4"), 
                         options=list(isStacked=TRUE))
       })
+      
+      
+#
+#
+#Communities TAB#  
+#                    
+#      
+      #-------------------------------------------------
+      #Reactive Functions (used by the render functions)
+      #-------------------------------------------------
+      
+      communities_reactive_region <- reactive({
+        switch(input$communities_input_region,
+               "NY" = c("NY"),
+               "SF Bay" = c("SF Bay"),
+               "Both Regions" = c("NY","SF Bay"))  
+      })
+      
+      communities_reactive_type <- reactive({
+        switch(input$communities_input_type,
+               "School" = c("SCHOOL"),
+               "Home/Work" = c("HOME", "WORKPLACE"),
+               "All" = c("SCHOOL","HOME", "WORKPLACE"))
+      })
+      communities_reactive_data <- reactive({
+        Community %>%
+          filter(Region %in% communities_reactive_region(), Community.Type %in% communities_reactive_type())
+      })      
+
+      
+      #-------------------------------------------------
+      #Render Functions
+      #-------------------------------------------------   
+      #Data Tab Output
+      output$communities_render_table_data <- renderDataTable({
+        communities_reactive_data()
+      })
+      
       
 })

@@ -7,6 +7,10 @@ library(zoo)
 library(googleVis)
 library(zipcode)
 setwd("/Users/shofujiwara/Dropbox/Farmigo/Shiny/RegionalDashboards/data")
+Community <- as.data.frame(read.csv("toMergeCommunity.csv", stringsAsFactors=FALSE, na.strings = "NA"))
+class(Community$comm_first_pickup_week)
+
+
 Orders <- as.data.frame(read.csv("toMergeOrders.csv", stringsAsFactors=FALSE, na.strings = "NA"))
 #change dates from strings-> dates
 Orders$First.order <- as.Date(Orders$First.order, format = "%Y-%m-%d")
