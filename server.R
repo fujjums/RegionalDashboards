@@ -211,10 +211,34 @@ shinyServer(
           group_by_(cohort_reactive_timeframe()) %>%
           summarise(AMO4=mean(count4, na.rm=TRUE), 
                     AMO12=mean(count12, na.rm=TRUE),
-                    AMO24=mean(count24, na.rm=TRUE)) %>%
+                    AMO24=mean(count24, na.rm=TRUE),
+                    count=sum(X..Orders>=1, na.rm=TRUE)) %>%
         gvisLineChart(xvar=cohort_reactive_timeframe(), 
-                      yvar=c("AMO4", "AMO12", "AMO24"),
-                      options=list(legend="bottom"))
+                      yvar=c("AMO4", "AMO12", "AMO24", "count"),
+                      options=list(legend="bottom",
+                                   series=
+                                      "[{type:'line', 
+                                       targetAxisIndex:0,
+                                       color:'blue'}, 
+                                       {type:'line', 
+                                       targetAxisIndex:0,
+                                       color:'red'},
+                                       {type:'line', 
+                                       targetAxisIndex:0,
+                                       color:'orange'},
+                                       {type:'bars', 
+                                       targetAxisIndex:1,
+                                       color:'lightgrey',
+                                       opacity: .8}]",
+                                   vAxes="[{title:'AMO-4,12,24'
+                                      }, 
+                                      {title:'Cohort Size',
+                                      maxValue:1000}]",
+                                   hAxes=
+                                        "[{format:'MMM-yy'}
+                                        ]"
+                                  )
+                      )
       })
       
       output$cohort_render_TMVgraph <- renderGvis({
@@ -223,22 +247,72 @@ shinyServer(
           group_by_(cohort_reactive_timeframe()) %>%
           summarise(TMV4=mean(sum4, na.rm=TRUE), 
                     TMV12=mean(sum12, na.rm=TRUE),
-                    TMV24=mean(sum24, na.rm=TRUE)) %>%
+                    TMV24=mean(sum24, na.rm=TRUE),
+                    count=sum(X..Orders>=1, na.rm=TRUE)
+                    ) %>%
           gvisLineChart(xvar=cohort_reactive_timeframe(), 
-                        yvar=c("TMV4", "TMV12", "TMV24"),
-                        options=list(legend="bottom"))
+                        yvar=c("TMV4", "TMV12", "TMV24", "count"),
+                        options=list(legend="bottom",
+                                     series=
+                                      "[{type:'line', 
+                                       targetAxisIndex:0,
+                                       color:'blue'}, 
+                                       {type:'line', 
+                                       targetAxisIndex:0,
+                                       color:'red'},
+                                       {type:'line', 
+                                       targetAxisIndex:0,
+                                       color:'orange'},
+                                       {type:'bars', 
+                                       targetAxisIndex:1,
+                                       color:'lightgrey',
+                                       opacity: .8}]",
+                                     vAxes=
+                                       "[{title:'AMO-4,12,24'}, 
+                                       {title:'Cohort Size',
+                                       maxValue:1000}]",
+                                     hAxes=
+                                       "[{format:'MMM-yy'}
+                                        ]"
+                                     
+                                      )
+                        
+                        )
+        
+        
+        
       })
       
       output$cohort_render_AMO4graph <- renderGvis({
-        orders_reactive_data <- cohort_reactive_data() %>% 
+        cohort_reactive_data <- cohort_reactive_data() %>% 
           filter(Community.Type %in% c("WORKPLACE", "HOME", "SCHOOL"), count4<=4) %>%
           group_by_(cohort_reactive_timeframe(), "count4") %>%
           summarise(Count=n()) %>%
           spread(count4, Count)
         
-          orders_reactive_data[,2:5] <- orders_reactive_data[,2:5]/rowSums(orders_reactive_data[,2:5], na.rm=TRUE)
-          gvisColumnChart(orders_reactive_data, xvar=cohort_reactive_timeframe(), yvar=c("1","2","3","4"), 
-                        options=list(isStacked=TRUE))
+          if(input$cohort_input_100perc==TRUE){
+            cohort_reactive_data[,2:5] <- cohort_reactive_data[,2:5]/rowSums(cohort_reactive_data[,2:5], na.rm=TRUE)  
+          }
+         
+          gvisColumnChart(cohort_reactive_data, 
+                          xvar=cohort_reactive_timeframe(), 
+                          yvar=c("1","2","3","4"), 
+                          options=list(
+                            isStacked=TRUE,
+                            legend="bottom",
+                            series=
+                              "[{
+                            color:'red'}, 
+                            {
+                            color:'orange'},
+                            {
+                            color:'green'},
+                            {
+                            color:'blue'}]")
+                            
+                          
+
+                          )
       })
       
       

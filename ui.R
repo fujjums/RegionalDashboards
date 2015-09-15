@@ -52,7 +52,7 @@ shinyUI(navbarPage("Regional Dashboard!",
                                 
                                 selectInput("cohort_input_type", label = h5("Choose a Community Type"), 
                                             choices = list("School", "Home/Work", "All"), selected = "All"),
-                                dateRangeInput("cohort_input_firstOrder", label = h5("Order Date Range") , start = "2013-01-01",
+                                dateRangeInput("cohort_input_firstOrder", label = h5("Order Date Range") , start = "2015-01-01",
                                                format = "yyyy-mm-dd", startview = "month")
                                 
                               ),
@@ -65,6 +65,7 @@ shinyUI(navbarPage("Regional Dashboard!",
                                            h4("TMV-4,12,24"),
                                            htmlOutput("cohort_render_TMVgraph"),
                                            h4("AMO-4 Breakout"),
+                                           checkboxInput("cohort_input_100perc", label = "100% Stacked", value = FALSE),
                                            htmlOutput("cohort_render_AMO4graph")
                                   )
                                 )
