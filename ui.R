@@ -24,10 +24,14 @@ shinyUI(navbarPage("Regional Dashboard!",
                                 ),
                               mainPanel(
                                 tabsetPanel(
-                                  tabPanel("Summary",  tableOutput("orders_render_table_summary")
-                                           , 
+                                  tabPanel("Summary",  
+                                           h3("Orders Data"),
+                                           tableOutput("orders_render_table_summary"),
+                                           h4("TOV"),
                                            htmlOutput("orders_render_graph_TOV"),
+                                           h4("# of Orders"),
                                            htmlOutput("orders_render_graph_ordercount"),
+                                           h4("Delivering Communities"),
                                            htmlOutput("orders_render_graph_communities")
                                   ),
                                   tabPanel("Map", leafletOutput("orders_render_map_orders")),
@@ -55,8 +59,12 @@ shinyUI(navbarPage("Regional Dashboard!",
                               
                               mainPanel(
                                 tabsetPanel(
-                                  tabPanel("Summary", htmlOutput("cohort_render_AMOgraph"),
+                                  tabPanel("Summary", 
+                                           h4("AMO-4,12,24"),
+                                           htmlOutput("cohort_render_AMOgraph"),
+                                           h4("TMV-4,12,24"),
                                            htmlOutput("cohort_render_TMVgraph"),
+                                           h4("AMO-4 Breakout"),
                                            htmlOutput("cohort_render_AMO4graph")
                                   )
                                 )
@@ -66,6 +74,8 @@ shinyUI(navbarPage("Regional Dashboard!",
                    tabPanel("Communities", 
                             sidebarLayout(
                               sidebarPanel(
+                                conditionalPanel(
+                                  'input.tabs === "Summary"',
                                 selectInput("communities_input_region", label = h5("Choose a Region"), 
                                             choices = list("NY", "SF Bay", "Both Regions"), selected = "Both Regions"),
                                 
@@ -73,11 +83,12 @@ shinyUI(navbarPage("Regional Dashboard!",
                                             choices = list("School", "Home/Work", "All"), selected = "All"),
                                 dateRangeInput("communities_input_orderWeek", label = h5("Order Date Range") , start = "2013-01-01",
                                                format = "yyyy-mm-dd", startview = "month")
-                                
+                                )
                               ),
                               
                               mainPanel(
                                 tabsetPanel(
+                                  id = 'tabs',
                                   tabPanel("Summary", dataTableOutput("communities_render_table_data")
                                   )
                                 )

@@ -271,7 +271,8 @@ shinyServer(
       #-------------------------------------------------   
       #Data Tab Output
       output$communities_render_table_data <- renderDataTable({
-        communities_reactive_data()
+        communities_reactive_data() %>%
+          select(Community, Region, Community.Type, comm_total_pickups, sum12, sum24, sum48, count12, count24, count48)
       })
       
       
