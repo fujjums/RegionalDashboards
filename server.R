@@ -78,14 +78,8 @@ shinyServer(
       orders_reactive_data <- reactive({
         Orders %>%
           filter(Region %in% orders_reactive_region(), Community.Type %in% orders_reactive_type(), 
-                 (Member.Order.Number >= input$orders_input_memberOrderNumber[1] &
-                    Member.Order.Number <= input$orders_input_memberOrderNumber[2] ),
                  (Pick.up.Date >= input$orders_input_orderDate[1] &
-                    Pick.up.Date <= input$orders_input_orderDate[2] ),
-                 (Value >= input$orders_input_value[1] &
-                    Value <= input$orders_input_value[2]),
-                 Coupon > orders_reactive_coupon(),
-                 Comp > orders_reactive_comp()
+                    Pick.up.Date <= input$orders_input_orderDate[2] )
           )
       })
       
@@ -154,6 +148,25 @@ shinyServer(
         
       })
       
+    #Deepdive
+      output$orders_render_table_deepdive <- renderTable({
+        orders_reactive_data() %>%
+         filter(
+           (Member.Order.Number >= input$orders_input_memberOrderNumber[1] &
+            Member.Order.Number <= input$orders_input_memberOrderNumber[2]),
+           (Value >= input$orders_input_value[1] &
+           Value <= input$orders_input_value[2]),
+           (Community.Pickup.Week >= input$orders_input_communityPickupWeek[1] &
+              Community.Pickup.Week <= input$orders_input_communityPickupWeek[2]),
+        Coupon > orders_reactive_coupon(),
+        Comp > orders_reactive_comp()) %>%
+          summarise(count = n(), avg=mean(Value), median=median(Value), distinct_members = n_distinct(Subscription.Id))
+            
+            
+          
+      })
+      
+
     #Data Tab Output
       output$orders_render_table_rawdata <- renderDataTable({
         orders_reactive_data()
@@ -274,13 +287,8 @@ shinyServer(
                                      hAxes=
                                        "[{format:'MMM-yy'}
                                         ]"
-                                     
                                       )
-                        
                         )
-        
-        
-        
       })
       
       output$cohort_render_AMO4graph <- renderGvis({
@@ -309,9 +317,6 @@ shinyServer(
                             color:'green'},
                             {
                             color:'blue'}]")
-                            
-                          
-
                           )
       })
       

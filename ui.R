@@ -13,18 +13,23 @@ shinyUI(navbarPage("Regional Dashboard!",
                                             choices = list("School", "Home/Work", "All"), selected = "All"),
                                 dateRangeInput("orders_input_orderDate", label = h5("Order Date Range") , start = "2015-01-01",
                                                format = "yyyy-mm-dd", startview = "month"),
-                                sliderInput("orders_input_memberOrderNumber", label = h5("Member Order Number"), min = 1, 
-                                            max = 100, value = c(1, 100)),
-                                checkboxInput("orders_input_couponBool", label = "Coupon", value = FALSE),
-                                checkboxInput("orders_input_comp
-                                              Bool", label = "Comp", value = FALSE),
-                                sliderInput("orders_input_value", label = h5("Order Value"), min = 1, 
-                                            max = 2000, value = c(1, 2000)),
-                                downloadButton('downloadData', 'Download Data')
+                                conditionalPanel(
+                                  'input.ordersTabs==="Deepdive"',
+                                  sliderInput("orders_input_memberOrderNumber", label = h5("Member Order Number"), min = 1, 
+                                              max = 100, value = c(1, 100)),
+                                  sliderInput("orders_input_communityPickupWeek", label = h5("Community Pickup Week"), min = 1, 
+                                              max = 100, value = c(1, 100)),
+                                  checkboxInput("orders_input_couponBool", label = "Coupon", value = FALSE),
+                                  checkboxInput("orders_input_comp
+                                                Bool", label = "Comp", value = FALSE),
+                                  sliderInput("orders_input_value", label = h5("Order Value"), min = 1, 
+                                              max = 2000, value = c(1, 2000)),
+                                  downloadButton('downloadData', 'Download Data'))
                                 ),
                               mainPanel(
                                 tabsetPanel(
-                                  tabPanel("Summary",  
+                                  id = 'ordersTabs',
+                                  tabPanel("Summary", 
                                            h3("Orders Data"),
                                            tableOutput("orders_render_table_summary"),
                                            h4("TOV"),
@@ -36,6 +41,7 @@ shinyUI(navbarPage("Regional Dashboard!",
                                   ),
                                   tabPanel("Map", leafletOutput("orders_render_map_orders")),
                                   # tabPanel("Map", plotOutput("map_communitiesmap")),
+                                  tabPanel("Deepdive", tableOutput("orders_render_table_deepdive")),
                                   tabPanel("RawData", dataTableOutput(outputId="orders_render_table_rawdata"))
                                 )  
                               )
@@ -81,9 +87,7 @@ shinyUI(navbarPage("Regional Dashboard!",
                                             choices = list("NY", "SF Bay", "Both Regions"), selected = "Both Regions"),
                                 
                                 selectInput("communities_input_type", label = h5("Choose a Community Type"), 
-                                            choices = list("School", "Home/Work", "All"), selected = "All"),
-                                dateRangeInput("communities_input_orderWeek", label = h5("Order Date Range") , start = "2013-01-01",
-                                               format = "yyyy-mm-dd", startview = "month")
+                                            choices = list("School", "Home/Work", "All"), selected = "All")
                                 )
                               ),
                               
