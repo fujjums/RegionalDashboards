@@ -212,7 +212,9 @@ shinyServer(
           summarise(AMO4=mean(count4, na.rm=TRUE), 
                     AMO12=mean(count12, na.rm=TRUE),
                     AMO24=mean(count24, na.rm=TRUE)) %>%
-        gvisLineChart(xvar=cohort_reactive_timeframe(), yvar=c("AMO4", "AMO12", "AMO24"))
+        gvisLineChart(xvar=cohort_reactive_timeframe(), 
+                      yvar=c("AMO4", "AMO12", "AMO24"),
+                      options=list(legend="bottom"))
       })
       
       output$cohort_render_TMVgraph <- renderGvis({
@@ -222,7 +224,9 @@ shinyServer(
           summarise(TMV4=mean(sum4, na.rm=TRUE), 
                     TMV12=mean(sum12, na.rm=TRUE),
                     TMV24=mean(sum24, na.rm=TRUE)) %>%
-          gvisLineChart(xvar=cohort_reactive_timeframe(), yvar=c("TMV4", "TMV12", "TMV24"))
+          gvisLineChart(xvar=cohort_reactive_timeframe(), 
+                        yvar=c("TMV4", "TMV12", "TMV24"),
+                        options=list(legend="bottom"))
       })
       
       output$cohort_render_AMO4graph <- renderGvis({
