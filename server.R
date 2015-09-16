@@ -83,6 +83,20 @@ shinyServer(
           )
       })
       
+      orders_reactive_data_deepdive <- reactive({
+        orders_reactive_data() %>%
+          filter(
+            (Member.Order.Number >= input$orders_input_memberOrderNumber[1] &
+               Member.Order.Number <= input$orders_input_memberOrderNumber[2]),
+            (Pick.up.Weeks.Since.Last >= input$orders_input_pickupsSinceLast[1] &
+               Pick.up.Weeks.Since.Last <= input$orders_input_pickupsSinceLast[2]),
+            (Value >= input$orders_input_value[1] &
+               Value <= input$orders_input_value[2]),
+            (Community.Pickup.Week >= input$orders_input_communityPickupWeek[1] &
+               Community.Pickup.Week <= input$orders_input_communityPickupWeek[2]),
+            Coupon > orders_reactive_coupon(),
+            Comp > orders_reactive_comp())
+      })
       
 #-------------------------------------------------
 #Render Functions
@@ -101,12 +115,22 @@ shinyServer(
           summarise(count = n(), avg=mean(Value), median=median(Value), distinct_members = n_distinct(Subscription.Id))
       })
       
+
       output$orders_render_graph_TOV <- renderGvis({
         graph_data <- orders_reactive_data() %>% 
           filter(Community.Type %in% c("WORKPLACE", "HOME", "SCHOOL")) %>%
           group_by(order_week, Community.Type) %>%
           summarise(Total=sum(Value)) %>%
           spread(Community.Type, Total)
+        gvisLineChart(graph_data, xvar="order_week", yvar=orders_reactive_type())
+      })
+      
+      output$orders_render_graph_AOV <- renderGvis({
+        graph_data <- orders_reactive_data() %>% 
+          filter(Community.Type %in% c("WORKPLACE", "HOME", "SCHOOL")) %>%
+          group_by(order_week, Community.Type) %>%
+          summarise(AOV=mean(Value)) %>%
+          spread(Community.Type, AOV)
         gvisLineChart(graph_data, xvar="order_week", yvar=orders_reactive_type())
       })
       
@@ -124,8 +148,8 @@ shinyServer(
           filter(Community.Type %in% c("WORKPLACE", "HOME", "SCHOOL")) %>%
           group_by(order_week, Community.Type) %>%
           summarise(Count = n_distinct(Community.Id)) %>%
-          spread(Community.Type, Count)
-        gvisLineChart(graph_data, xvar="order_week", yvar=orders_reactive_type())
+          spread(Community.Type, Count) %>%
+        gvisLineChart(xvar="order_week", yvar=orders_reactive_type())
       })
       
     #Map Tab Output
@@ -150,26 +174,45 @@ shinyServer(
       
     #Deepdive
       output$orders_render_table_deepdive <- renderTable({
-        orders_reactive_data() %>%
-         filter(
-           (Member.Order.Number >= input$orders_input_memberOrderNumber[1] &
-            Member.Order.Number <= input$orders_input_memberOrderNumber[2]),
-           (Value >= input$orders_input_value[1] &
-           Value <= input$orders_input_value[2]),
-           (Community.Pickup.Week >= input$orders_input_communityPickupWeek[1] &
-              Community.Pickup.Week <= input$orders_input_communityPickupWeek[2]),
-        Coupon > orders_reactive_coupon(),
-        Comp > orders_reactive_comp()) %>%
+          orders_reactive_data_deepdive() %>%
           summarise(count = n(), avg=mean(Value), median=median(Value), distinct_members = n_distinct(Subscription.Id))
-            
-            
-          
       })
       
+      output$orders_render_table_coupon <- renderTable({
+        Coup<- orders_reactive_data_deepdive() %>%
+          summarise(
+                    "Avg. Value" = mean(Coupon[Coupon>0]),
+                    "Total Value" = sum(Coupon[Coupon>0]),
+                    No_Discount = sum(Coupon==0),
+                    Discount = sum(Coupon>0),
+                    "%Discount" =  Discount/sum(Discount+No_Discount))
+        
+        Comp<-orders_reactive_data_deepdive() %>%
+          summarise(
+            "Avg. Value" = mean(Comp[Comp>0]),
+            "Total Value" =  sum(Comp[Comp>0]),
+            No_Discount= sum(Comp==0),
+            Discount = sum(Comp>0),
+            "%Discount" = Discount/sum(Discount+No_Discount))
+        
+        output <- rbind(Coup, Comp)
+        row.names(output) <- c("Coup", "Comp")
+        output
+       })
+      
+      output$orders_render_table_comp <- renderTable({
+        orders_reactive_data_deepdive() %>%
+          summarise(
+            "Avg. Comp Value" = mean(Comp[Comp>0]),
+            "Total Comp Value" =  sum(Comp[Comp>0]),
+            "NoComp" = sum(Comp==0),
+            "Comp" = sum(Comp>0),
+            "%Comp" = Comp/sum(Comp+NoComp))
+      })
 
     #Data Tab Output
       output$orders_render_table_rawdata <- renderDataTable({
-        orders_reactive_data()
+        orders_reactive_data_deepdive()
       })
     
 

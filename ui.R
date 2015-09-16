@@ -16,14 +16,16 @@ shinyUI(navbarPage("Regional Dashboard!",
                                 conditionalPanel(
                                   'input.ordersTabs==="Deepdive"',
                                   sliderInput("orders_input_memberOrderNumber", label = h5("Member Order Number"), min = 1, 
-                                              max = 100, value = c(1, 100)),
+                                              max = 200, value = c(1, 200)),
                                   sliderInput("orders_input_communityPickupWeek", label = h5("Community Pickup Week"), min = 1, 
-                                              max = 100, value = c(1, 100)),
+                                              max = 200, value = c(1, 200)),
+                                  sliderInput("orders_input_pickupsSinceLast", label = h5("Pickup Weeks Since Last Order"), min = 0, 
+                                              max = 200, value = c(0, 200)),
                                   checkboxInput("orders_input_couponBool", label = "Coupon", value = FALSE),
                                   checkboxInput("orders_input_comp
                                                 Bool", label = "Comp", value = FALSE),
-                                  sliderInput("orders_input_value", label = h5("Order Value"), min = 1, 
-                                              max = 2000, value = c(1, 2000)),
+                                  sliderInput("orders_input_value", label = h5("Order Value"), min = 0, 
+                                              max = 2000, value = c(0, 2000)),
                                   downloadButton('downloadData', 'Download Data'))
                                 ),
                               mainPanel(
@@ -34,14 +36,21 @@ shinyUI(navbarPage("Regional Dashboard!",
                                            tableOutput("orders_render_table_summary"),
                                            h4("TOV"),
                                            htmlOutput("orders_render_graph_TOV"),
+                                           h4("AOV"),
+                                           htmlOutput("orders_render_graph_AOV"),
                                            h4("# of Orders"),
                                            htmlOutput("orders_render_graph_ordercount"),
                                            h4("Delivering Communities"),
                                            htmlOutput("orders_render_graph_communities")
-                                  ),
+                                           ),
                                   tabPanel("Map", leafletOutput("orders_render_map_orders")),
                                   # tabPanel("Map", plotOutput("map_communitiesmap")),
-                                  tabPanel("Deepdive", tableOutput("orders_render_table_deepdive")),
+                                  tabPanel("Deepdive", 
+                                           tableOutput("orders_render_table_deepdive"),
+                                           tableOutput("orders_render_table_coupon"),
+                                           tableOutput("orders_render_table_comp")
+                                           
+                                           ),
                                   tabPanel("RawData", dataTableOutput(outputId="orders_render_table_rawdata"))
                                 )  
                               )
