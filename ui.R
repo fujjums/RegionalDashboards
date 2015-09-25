@@ -40,6 +40,8 @@ shinyUI(navbarPage("Regional Dashboard!",
                                            htmlOutput("orders_render_graph_AOV"),
                                            h4("# of Orders"),
                                            htmlOutput("orders_render_graph_ordercount"),
+                                           h4("New Members"),
+                                           htmlOutput("orders_render_graph_newmembers"),
                                            h4("Delivering Communities"),
                                            htmlOutput("orders_render_graph_communities")
                                            ),
@@ -81,7 +83,8 @@ shinyUI(navbarPage("Regional Dashboard!",
                                            htmlOutput("cohort_render_TMVgraph"),
                                            h4("AMO-4 Breakout"),
                                            checkboxInput("cohort_input_100perc", label = "100% Stacked", value = FALSE),
-                                           htmlOutput("cohort_render_AMO4graph")
+                                           htmlOutput("cohort_render_AMO4graph"),
+                                           htmlOutput("cohort_render_AMO4vsTMV12")
                                   )
                                 )
                               )

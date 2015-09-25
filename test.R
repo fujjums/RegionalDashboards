@@ -129,3 +129,22 @@ leaflet(df) %>% addTiles() %>%
 
 CommunityWeeks <- as.data.frame(read.csv("toMergeCommunityWeeks.csv", stringsAsFactors=FALSE, na.strings = "NA"))
 CommunityWeeks$order_week <- as.Date(CommunityWeeks$order_week, format = "%Y-%m-%d")
+
+library(dplyr)
+CouponDF <- data.frame(Coupon = c(0,0,10,10,20,40,20,10))
+CouponDF %>%
+    summarise(
+      AvgCoupon = mean(Coupon[Coupon>0]),
+      NoCoupon = sum(Coupon==0),
+      Coupon = sum(Coupon>0)
+      )
+
+CouponDF %>%
+  summarise(
+    NoCoupon = sum(Coupon==0),
+    Coupon = sum(Coupon>0),
+    AvgCoupon = mean(Coupon[Coupon>0])
+  )
+      
+                 
+

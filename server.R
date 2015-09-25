@@ -112,7 +112,11 @@ shinyServer(
     #Summary Tab Output
       output$orders_render_table_summary <- renderTable({
           orders_reactive_data() %>%
-          summarise(count = n(), avg=mean(Value), median=median(Value), distinct_members = n_distinct(Subscription.Id))
+          summarise(count = n(), 
+                    avg=mean(Value), 
+                    median=median(Value), 
+                    distinct_members = n_distinct(Subscription.Id),
+                    distinct_comms = n_distinct(Community.Id))
       })
       
 
@@ -142,6 +146,16 @@ shinyServer(
           spread(Community.Type, Count)
         gvisLineChart(graph_data, xvar="order_week", yvar=orders_reactive_type())
       })
+      
+      output$orders_render_graph_newmembers <- renderGvis({
+        graph_data <- orders_reactive_data() %>% 
+          filter(Community.Type %in% c("WORKPLACE", "HOME", "SCHOOL"), Member.Order.Number == 1) %>%
+          group_by(order_week, Community.Type) %>%
+          summarise(Count=n()) %>%
+          spread(Community.Type, Count)
+        gvisLineChart(graph_data, xvar="order_week", yvar=orders_reactive_type())
+      })
+      
       
       output$orders_render_graph_communities <- renderGvis({
         graph_data <- orders_reactive_data() %>% 
@@ -328,7 +342,9 @@ shinyServer(
                                        {title:'Cohort Size',
                                        maxValue:1000}]",
                                      hAxes=
-                                       "[{format:'MMM-yy'}
+                                       "[{
+                                        slantedText: 'TRUE',
+                                        slantedTextAngle: 90}
                                         ]"
                                       )
                         )
@@ -361,6 +377,26 @@ shinyServer(
                             {
                             color:'blue'}]")
                           )
+      })
+      
+      output$cohort_render_AMO4vsTMV12 <- renderGvis({
+        cohort_reactive_data() %>% 
+          filter(Community.Type %in% c("WORKPLACE", "HOME", "SCHOOL")) %>%
+          group_by_(cohort_reactive_timeframe()) %>%
+          summarise(AMO4=mean(count4, na.rm=TRUE), 
+                    TMV12=mean(sum12, na.rm=TRUE)) %>%
+          select(AMO4,TMV12) %>%
+        gvisScatterChart(
+          options=list(
+                                      vAxes=
+                                        "[{title:'TMV-12'}]", 
+                                      hAxes=
+                                        "[{title:'AMO-4'}]"
+            
+           )
+          
+        )
+        
       })
       
       
